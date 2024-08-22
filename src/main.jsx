@@ -2,19 +2,22 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { ClerkProvider } from "@clerk/clerk-react";
 import App from "./App";
-import SignIn from "./auth/SignIn";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
+import SignInPage from "./auth/SignInPage";
+
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing Publishable Key");
+}
 
 const router = createBrowserRouter([
   {
     element: <App />,
     children: [
-      {
-        path: "/",
-        element: <Home />,
-      },
       {
         path: "/dashboard",
         element: <Dashboard />,
@@ -22,13 +25,19 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: "/",
+    element: <Home />,
+  },
+  {
     path: "/auth/signIn",
-    element: <SignIn />,
+    element: <SignInPage />,
   },
 ]);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+      <RouterProvider router={router} />
+    </ClerkProvider>
   </StrictMode>
 );
